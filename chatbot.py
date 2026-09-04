@@ -48,13 +48,7 @@ def load_index():
 def answer_question(prompt: str, 
                     client: OpenAI, 
                     chat_history: list[dict], 
-                    index: VectorStoreIndex,
-                    rerank):
-    
-    retriever = index.as_retriever(
-    similarity_top_k=10,
-    node_postprocessors=[rerank],
-    )
+                    retriever):
 
     nodes = retriever.retrieve(prompt)
     context = "\n\n".join([nodes.get_content() for nodes in nodes])

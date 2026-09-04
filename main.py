@@ -8,7 +8,7 @@ from llama_index.postprocessor.cohere_rerank import CohereRerank
 from chatbot import load_index, answer_question
 
 
-def start_session(): # user-specific session
+def start_session():
     if "chat_history" not in st.session_state:
         st.session_state["chat_history"] = []
     
@@ -16,13 +16,14 @@ def start_session(): # user-specific session
         st.session_state["chat_limit"] = 0
 
 
-@st.cache_resource(show_spinner=False) # shared between different users
+@st.cache_resource(show_spinner=False)
 def load_resources():
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     index = load_index()
     rerank = CohereRerank(api_key=st.secrets["OPENAI_API_KEY"], top_n=3, max_retries=3)
+    retriever = index.as_retriever(similarity_top_k=10, node_postprocessors=[rerank])
     
-    return client, index, rerank
+    return client, retriever
 
 
 def stream_answer(answer):
@@ -32,7 +33,6 @@ def stream_answer(answer):
 
 
 def run():
-    #st.title("Alexander Weyhe - CV Chatbot")
     st.markdown(
     """
     <div class="header">
@@ -53,7 +53,7 @@ def run():
 
     
     with st.spinner("Loading chatbot..."):
-        client, index, rerank = load_resources()
+        client, retriever = load_resources()
     
     for message in st.session_state["chat_history"]:
         avatar_path = "extras/avatar.png" if message["role"] == "assistant" else None
@@ -72,8 +72,7 @@ def run():
         answer = answer_question(prompt=prompt,
                                 client=client,
                                 chat_history=st.session_state["chat_history"],
-                                rerank=rerank,
-                                index=index)
+                                retriever=retriever)
             
         with st.chat_message("assistant", avatar="extras/avatar.png"):
             st.write_stream(stream_answer(answer))
