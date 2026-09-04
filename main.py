@@ -62,7 +62,7 @@ def run():
             st.markdown(message["content"])
     
     prompt = st.chat_input("Stelle eine Frage zu Alex' Lebenslauf.\n"
-                            "Ask a question about Alex' CV.",
+                            "Ask a question about Alex's resume.",
                             disabled=st.session_state["chat_limit"] >= 10)
         
     if prompt:
