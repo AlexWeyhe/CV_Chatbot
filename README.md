@@ -1,0 +1,1 @@
+This project aimed at creating a RAG-based Chatbot that can answer questions about me (Alexander Weyhe 😎) and my professional (and personal) life.
