@@ -12,7 +12,6 @@ dependencies = [
     "llama-index-postprocessor-cohere-rerank>=0.9.0",
     "llama-index-vector-stores-chroma>=0.5.5",
     "openai>=2.53.0",
-    "python-dotenv>=1.2.2",
     "python-frontmatter>=1.3.0",
     "streamlit>=1.62.0",
     "transformers>=5.14.1",

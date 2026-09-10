@@ -2,7 +2,6 @@ import time
 
 import streamlit as st
 from openai import OpenAI
-from dotenv import load_dotenv
 from llama_index.postprocessor.cohere_rerank import CohereRerank
 
 from chatbot import load_index, answer_question
