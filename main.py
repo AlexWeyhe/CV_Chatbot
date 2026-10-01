@@ -2,7 +2,7 @@ import time
 
 import streamlit as st
 from openai import OpenAI
-from llama_index.postprocessor.cohere_rerank import CohereRerank
+from llama_index.core.postprocessor import SentenceTransformerRerank
 
 from chatbot import load_index, answer_question
 
@@ -19,10 +19,13 @@ def start_session():
 def load_resources():
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     index = load_index()
-    rerank = CohereRerank(api_key=st.secrets["OPENAI_API_KEY"], top_n=3, max_retries=3)
-    retriever = index.as_retriever(similarity_top_k=10, node_postprocessors=[rerank])
+    rerank = SentenceTransformerRerank(
+        model="cross-encoder/ms-marco-MiniLM-L6-v2",
+        top_n=3,
+    )
+    retriever = index.as_retriever(similarity_top_k=10)
     
-    return client, retriever
+    return client, retriever, rerank
 
 
 def stream_answer(answer):
@@ -52,7 +55,7 @@ def run():
 
     
     with st.spinner("Loading chatbot..."):
-        client, retriever = load_resources()
+        client, retriever, rerank = load_resources()
     
     for message in st.session_state["chat_history"]:
         avatar_path = "extras/avatar.png" if message["role"] == "assistant" else None
@@ -71,7 +74,8 @@ def run():
         answer = answer_question(prompt=prompt,
                                 client=client,
                                 chat_history=st.session_state["chat_history"],
-                                retriever=retriever)
+                                retriever=retriever,
+                                rerank=rerank)
             
         with st.chat_message("assistant", avatar="extras/avatar.png"):
             st.write_stream(stream_answer(answer))

@@ -50,10 +50,15 @@ def load_index():
 def answer_question(prompt: str, 
                     client: OpenAI, 
                     chat_history: list[dict], 
-                    retriever):
+                    retriever,
+                    rerank):
 
     nodes = retriever.retrieve(prompt)
-    context = "\n\n".join([nodes.get_content() for nodes in nodes])
+    reranked_nodes = rerank.postprocess_nodes(
+        nodes,
+        query_str=prompt,
+    )
+    context = "\n\n".join([nodes.get_content() for nodes in reranked_nodes])
     
     messages = [
         {
