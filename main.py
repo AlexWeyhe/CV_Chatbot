@@ -21,7 +21,7 @@ def load_resources():
     index = load_index()
     rerank = SentenceTransformerRerank(
         model="cross-encoder/ms-marco-MiniLM-L6-v2",
-        top_n=3,
+        top_n=5,
     )
     retriever = index.as_retriever(similarity_top_k=10)
     
